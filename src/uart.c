@@ -43,7 +43,7 @@ void write_uart_message_request(int uart, int code)
         codeNumber = REQUEST_KEY_STATE;
     }
 
-    unsigned char data[7] = {SERVER_CODE, REQUEST_CODE, codeNumber, 0x05, 0x09, 0x06, 0x06};
+    unsigned char data[7] = {SERVER_CODE, REQUEST_CODE, codeNumber, 5, 9, 6, 6};
     short crc = calcula_CRC(data, 7);
 
     unsigned char message[9];
@@ -66,7 +66,7 @@ void write_uart_message_request(int uart, int code)
 void write_uart_message_send(int uart, int control_signal)
 {
 
-    unsigned char data[7] = {SERVER_CODE, SEND_CODE, SEND_CONTROL_SIGNAL, 0x05, 0x09, 0x06, 0x06};
+    unsigned char data[7] = {SERVER_CODE, SEND_CODE, SEND_CONTROL_SIGNAL, 5, 9, 6, 6};
     unsigned char message[13];
 
     memcpy(message, &data, 7);
