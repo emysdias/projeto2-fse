@@ -65,7 +65,6 @@ void write_uart_message_request(int uart, int code)
 
 void write_uart_message_send(int uart, int control_signal)
 {
-
     unsigned char data[7] = {SERVER_CODE, SEND_CODE, SEND_CONTROL_SIGNAL, 5, 9, 6, 6};
     unsigned char message[13];
 
@@ -73,7 +72,6 @@ void write_uart_message_send(int uart, int control_signal)
     memcpy(&message[7], &control_signal, 4);
 
     short crc = calcula_CRC(message, 11);
-
     memcpy(&message[11], &crc, 2);
 
     if (uart != -1)

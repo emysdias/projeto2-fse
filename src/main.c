@@ -1,10 +1,10 @@
 #include "../inc/main.h"
 
 void info_thread();
-// void write_csv_thread();
-void get_temperatures();
+void write_csv_thread();
+// void get_temperatures();
 void check_key_state();
-// void get_control_signal();
+void get_control_signal();
 void shut_down_system();
 
 int uart;
@@ -15,7 +15,7 @@ int pid = 1;
 float hysteresis = 2.0;
 int use_key_switch = 0;
 
-int main(int argc, char *argv[])
+int main()
 {
   pthread_t tid[3];
 
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
   // write_uart_message_request(uart, REQUEST_DS18B20_TEMPERATURE);
   setup_gpio();
   // setup_bme280();
-  // setup_lcd();
+  setup_lcd();
   // setup_csv();
 
   // pthread_create(&tid[0], NULL, (void *)menu, (void *)NULL);
@@ -49,9 +49,9 @@ void info_thread()
     }
 
     get_temperatures();
-    // lcd_print(TR, TI, TE);
+    lcd_print(TR, TI, TE);
 
-    // get_control_signal();
+    get_control_signal();
     send_control_signal(uart, control_output);
 
     // info(TR, TI, TE, potentiometer, pid, Kp, Ki, Kd, hysteresis, use_key_switch);
@@ -60,22 +60,22 @@ void info_thread()
   }
 }
 
-// void write_csv_thread()
-// {
-//   while (1)
-//   {
-//     if (pid)
-//     {
-//       write_csv(TR, TI, TE, control_output);
-//     }
-//     else if (!pid && control_output != 0)
-//     {
-//       write_csv(TR, TI, TE, control_output);
-//     }
+void write_csv_thread()
+{
+  while (1)
+  {
+    if (pid)
+    {
+      write_csv(TR, TI, TE, control_output);
+    }
+    else if (!pid && control_output != 0)
+    {
+      write_csv(TR, TI, TE, control_output);
+    }
 
-//     sleep(2);
-//   }
-// }
+    sleep(2);
+  }
+}
 
 void get_temperatures()
 {
@@ -120,30 +120,30 @@ void check_key_state()
   }
 }
 
-// void get_control_signal()
-// {
-//   if (pid)
-//   {
-//     pid_configure_constants(Kp, Ki, Kd);
-//     pid_update_reference(TR);
-//     control_output = pid_control(TI);
-//     manage_gpio_devices(control_output);
-//   }
-//   else
-//   {
-//     int control_output_temp = on_off_control(TR, TI, hysteresis);
+void get_control_signal()
+{
+  if (pid)
+  {
+    pid_configure_constants(Kp, Ki, Kd);
+    pid_update_reference(TR);
+    control_output = pid_control(TI);
+    manage_gpio_devices(control_output);
+  }
+  // else
+  // {
+  //   int control_output_temp = on_off_control(TR, TI, hysteresis);
 
-//     if (control_output_temp != 0)
-//     {
-//       control_output = control_output_temp;
-//     }
-//   }
-// }
+  //   if (control_output_temp != 0)
+  //   {
+  //     control_output = control_output_temp;
+  //   }
+  // }
+}
 
 void shut_down_system()
 {
   disable_fan_and_resistor();
-  // ClrLcd();
+  ClrLcd();
   close_uart(uart);
   // close_bme280();
   // refresh();
