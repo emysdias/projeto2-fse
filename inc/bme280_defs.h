@@ -384,8 +384,6 @@ struct bme280_dev
     struct bme280_settings settings;
 };
 
-int i2c_filestream;
-
 #endif /* BME280_DEFS_H_ */
        /** @}*/
        /** @}*/

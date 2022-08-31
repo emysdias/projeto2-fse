@@ -1,14 +1,19 @@
 #include "../inc/main.h"
+#include "../inc/led.h"
+#include "../inc/uart.h"
+#include "../inc/get_temperature.h"
 
 void info_thread();
-void write_csv_thread();
-// void get_temperatures();
+// void write_csv_thread();
+void get_temperatures();
 void check_key_state();
 void get_control_signal();
 void shut_down_system();
 
+struct bme280_dev bme_connection;
+
 int uart;
-float TR = 0.0, TI = 0.0, TE = 0.0, control_output = 0.0;
+float TR = 49.5, TI = 0.0, TE = 0.0, control_output = 0.0;
 float Kp = 30.0, Ki = 0.2, Kd = 400.0;
 int potentiometer = 1;
 int pid = 1;
@@ -20,6 +25,7 @@ int main()
   pthread_t tid[3];
 
   uart = init_uart();
+  bme_connection = connectBme();
   // write_uart_message_request(uart, REQUEST_DS18B20_TEMPERATURE);
   setup_gpio();
   // setup_bme280();
@@ -60,22 +66,22 @@ void info_thread()
   }
 }
 
-void write_csv_thread()
-{
-  while (1)
-  {
-    if (pid)
-    {
-      write_csv(TR, TI, TE, control_output);
-    }
-    else if (!pid && control_output != 0)
-    {
-      write_csv(TR, TI, TE, control_output);
-    }
+// void write_csv_thread()
+// {
+//   while (1)
+//   {
+//     if (pid)
+//     {
+//       write_csv(TR, TI, TE, control_output);
+//     }
+//     else if (!pid && control_output != 0)
+//     {
+//       write_csv(TR, TI, TE, control_output);
+//     }
 
-    sleep(2);
-  }
-}
+//     sleep(2);
+//   }
+// }
 
 void get_temperatures()
 {
@@ -91,7 +97,7 @@ void get_temperatures()
   }
 
   TI = DS18B20_temperature(uart, TI);
-  // TE = bme280_get_temperature();
+  TE = getCurrentTemperature(&bme_connection);
 }
 
 void set_use_key_switch()

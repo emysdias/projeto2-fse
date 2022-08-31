@@ -1,5 +1,17 @@
 #include "led.h"
-
+/*
+*
+* by Lewis Loflin www.bristolwatch.com lewis@bvu.net
+* http://www.bristolwatch.com/rpi/i2clcd.htm
+* Using wiringPi by Gordon Henderson
+*
+*
+* Port over lcd_i2c.py to C and added improvements.
+* Supports 16x2 and 20x4 screens.
+* This was to learn now the I2C lcd displays operate.
+* There is no warrenty of any kind use at your own risk.
+*
+*/
 // Define some device parameters
 #define I2C_ADDR 0x27 // I2C device address
 
@@ -30,7 +42,6 @@ int fd; // seen by all subroutines
 void lcd_print(float tr, float ti, float te)
 {
     usleep(100000);
-
     lcdLoc(LINE1);
     typeln("TR:");
     typeFloat(tr);

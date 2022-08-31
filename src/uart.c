@@ -89,13 +89,13 @@ void write_uart_message_send(int uart, int control_signal)
 
 float read_uart_message_temperature(int uart)
 {
-    float response = 0.0;
+    float response = -1.0;
     //-------------- CHECK FOR ANY RX BYTES --------------
     if (uart != -1)
     {
         // Read up to 255 characters from the port if they are there
-        unsigned char rx_buffer[256];
-        int rx_length = read(uart, (void *)rx_buffer, 255);
+        unsigned char rx_buffer[20];
+        int rx_length = read(uart, rx_buffer, 20);
 
         if (rx_length < 0)
         {
@@ -110,10 +110,8 @@ float read_uart_message_temperature(int uart)
         else
         {
             rx_buffer[rx_length] = '\0';
-            int data;
-            memcpy(&data, &rx_buffer[3], 4);
-            printf("Float: %d\n", data);
-            response = data;
+            memcpy(&response, &rx_buffer[3], sizeof(float));
+            printf("Float: %f\n", response);
         }
     }
 
@@ -156,6 +154,7 @@ int read_uart_message_key_state(int uart)
 float potentiometer_temperature(int uart, float TR)
 {
     write_uart_message_request(uart, POTENTIOMETER);
+    printf("yes\n\n");
 
     float TR_temp = read_uart_message_temperature(uart);
 
@@ -170,6 +169,7 @@ float potentiometer_temperature(int uart, float TR)
 float DS18B20_temperature(int uart, float TI)
 {
     write_uart_message_request(uart, DS18B20);
+    printf("aqui\n\n");
 
     float TI_temp = read_uart_message_temperature(uart);
 
