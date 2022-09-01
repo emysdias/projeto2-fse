@@ -13,7 +13,7 @@ void shut_down_system();
 struct bme280_dev bme_connection;
 
 int uart;
-float TR = 49.5, TI = 0.0, TE = 0.0, control_output = 0.0;
+float TR = 0.0, TI = 0.0, TE = 0.0, control_output = 0.0;
 float Kp = 30.0, Ki = 0.2, Kd = 400.0;
 int potentiometer = 1;
 int pid = 1;
@@ -26,7 +26,6 @@ int main()
 
   uart = init_uart();
   bme_connection = connectBme();
-  // write_uart_message_request(uart, REQUEST_DS18B20_TEMPERATURE);
   setup_gpio();
   // setup_bme280();
   setup_lcd();
@@ -65,23 +64,6 @@ void info_thread()
     usleep(700000);
   }
 }
-
-// void write_csv_thread()
-// {
-//   while (1)
-//   {
-//     if (pid)
-//     {
-//       write_csv(TR, TI, TE, control_output);
-//     }
-//     else if (!pid && control_output != 0)
-//     {
-//       write_csv(TR, TI, TE, control_output);
-//     }
-
-//     sleep(2);
-//   }
-// }
 
 void get_temperatures()
 {
@@ -135,15 +117,30 @@ void get_control_signal()
     control_output = pid_control(TI);
     manage_gpio_devices(control_output);
   }
-  // else
-  // {
-  //   int control_output_temp = on_off_control(TR, TI, hysteresis);
+  else
+  {
+    printf("################### heree\n\n");
+    int control_output_temp = 0;
 
-  //   if (control_output_temp != 0)
-  //   {
-  //     control_output = control_output_temp;
-  //   }
-  // }
+    float top_limit = TR + hysteresis / 2.0;
+    float bottom_limit = TR - hysteresis / 2.0;
+
+    if (TI >= top_limit)
+    {
+      control_output_temp = -100;
+      manage_gpio_devices(control_output_temp);
+    }
+    else if (TI <= bottom_limit)
+    {
+      control_output_temp = 100;
+      manage_gpio_devices(control_output_temp);
+    }
+
+    if (control_output_temp != 0)
+    {
+      control_output = control_output_temp;
+    }
+  }
 }
 
 void shut_down_system()
