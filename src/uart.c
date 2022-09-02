@@ -40,6 +40,7 @@ void write_uart_message_request(int uart, int code)
     }
     else if (code == KEY_STATE)
     {
+        printf("ta aqui\n");
         codeNumber = REQUEST_KEY_STATE;
     }
 
@@ -111,7 +112,6 @@ float read_uart_message_temperature(int uart)
         {
             rx_buffer[rx_length] = '\0';
             memcpy(&response, &rx_buffer[3], sizeof(float));
-            printf("Float: %f\n", response);
         }
     }
 
@@ -154,7 +154,6 @@ int read_uart_message_key_state(int uart)
 float potentiometer_temperature(int uart, float TR)
 {
     write_uart_message_request(uart, POTENTIOMETER);
-    printf("yes\n\n");
 
     float TR_temp = read_uart_message_temperature(uart);
 
@@ -162,6 +161,7 @@ float potentiometer_temperature(int uart, float TR)
     {
         TR_temp = TR;
     }
+    printf("TR: %f\n", TR_temp);
 
     return TR_temp;
 }
@@ -169,7 +169,6 @@ float potentiometer_temperature(int uart, float TR)
 float DS18B20_temperature(int uart, float TI)
 {
     write_uart_message_request(uart, DS18B20);
-    printf("aqui\n\n");
 
     float TI_temp = read_uart_message_temperature(uart);
 
@@ -178,6 +177,7 @@ float DS18B20_temperature(int uart, float TI)
         TI_temp = TI;
     }
 
+    printf("TI: %f\n", TI_temp);
     return TI_temp;
 }
 

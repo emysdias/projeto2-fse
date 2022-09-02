@@ -19,6 +19,7 @@ int potentiometer = 1;
 int pid = 1;
 float hysteresis = 2.0;
 int use_key_switch = 0;
+int down = 0;
 
 int main()
 {
@@ -48,10 +49,11 @@ void info_thread()
 
   while (1)
   {
-    if (use_key_switch)
-    {
-      check_key_state();
-    }
+
+    // if (use_key_switch)
+    // {
+    check_key_state();
+    // }
 
     get_temperatures();
     lcd_print(TR, TI, TE);
@@ -82,27 +84,36 @@ void get_temperatures()
   TE = getCurrentTemperature(&bme_connection);
 }
 
-void set_use_key_switch()
-{
-  if (use_key_switch)
-  {
-    use_key_switch = 0;
-  }
-  else
-  {
-    use_key_switch = 1;
-  }
-}
-
 void check_key_state()
 {
   int key_state = get_key_state(uart);
 
-  if (key_state == 0)
+  if (key_state == 1)
   {
+    down = 0;
+    printf("Air Fryer ligada\n");
     pid = 0;
   }
-  else
+  else if (key_state == 2)
+  {
+    disable_fan_and_resistor();
+    ClrLcd();
+    printf("Air Fryer desligada\n");
+    down = 1;
+    pid = 0;
+  }
+  else if (key_state == 3)
+  {
+    pid = 1;
+    printf("Air Fryer iniciando\n");
+  }
+  else if (key_state == 4)
+  {
+    pid = 0;
+    down = 1;
+    printf("Air Fryer parando\n");
+  }
+  else if (down == 0)
   {
     pid = 1;
   }
@@ -112,6 +123,7 @@ void get_control_signal()
 {
   if (pid)
   {
+    // printf("ligado\n\n");
     pid_configure_constants(Kp, Ki, Kd);
     pid_update_reference(TR);
     control_output = pid_control(TI);
@@ -119,7 +131,7 @@ void get_control_signal()
   }
   else
   {
-    printf("################### heree\n\n");
+    // printf("desligando\n\n");
     int control_output_temp = 0;
 
     float top_limit = TR + hysteresis / 2.0;
