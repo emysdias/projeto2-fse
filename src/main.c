@@ -109,7 +109,8 @@ void check_key_state()
     printf("Air Fryer parando\n");
     control_output = pid_control(TI);
     manage_gpio_devices(control_output);
-    enable_fan(control_output);
+    int value = (int)control_output;
+    enable_fan(value);
     disable_resistor();
   }
   else if (key_state == 0 && down == 0)
