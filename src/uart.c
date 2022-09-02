@@ -40,7 +40,6 @@ void write_uart_message_request(int uart, int code)
     }
     else if (code == KEY_STATE)
     {
-        printf("ta aqui\n");
         codeNumber = REQUEST_KEY_STATE;
     }
 
@@ -143,7 +142,6 @@ int read_uart_message_key_state(int uart)
             rx_buffer[rx_length] = '\0';
             int data;
             memcpy(&data, &rx_buffer[3], 4);
-            printf("Float2: %d\n", data);
             response = data;
         }
     }

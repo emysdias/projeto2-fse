@@ -4,7 +4,6 @@
 #include "../inc/get_temperature.h"
 
 void info_thread();
-// void write_csv_thread();
 void get_temperatures();
 void check_key_state();
 void get_control_signal();
@@ -28,13 +27,9 @@ int main()
   uart = init_uart();
   bme_connection = connectBme();
   setup_gpio();
-  // setup_bme280();
   setup_lcd();
-  // setup_csv();
 
-  // pthread_create(&tid[0], NULL, (void *)menu, (void *)NULL);
   pthread_create(&tid[1], NULL, (void *)info_thread, (void *)NULL);
-  // pthread_create(&tid[2], NULL, (void *)write_csv_thread, (void *)NULL);
 
   pthread_join(tid[0], NULL);
   pthread_join(tid[1], NULL);
@@ -49,21 +44,21 @@ void info_thread()
 
   while (1)
   {
-
-    // if (use_key_switch)
-    // {
     check_key_state();
-    // }
-
     get_temperatures();
-    lcd_print(TR, TI, TE);
+    if (down == 2)
+    {
+      ClrLcd();
+    }
+    else
+    {
+      lcd_print(TR, TI, TE);
+    }
 
     get_control_signal();
     send_control_signal(uart, control_output);
 
-    // info(TR, TI, TE, potentiometer, pid, Kp, Ki, Kd, hysteresis, use_key_switch);
-
-    usleep(700000);
+    usleep(500);
   }
 }
 
@@ -92,15 +87,15 @@ void check_key_state()
   {
     down = 0;
     printf("Air Fryer ligada\n");
-    pid = 0;
+    setup_lcd();
+    pid = -1;
   }
   else if (key_state == 2)
   {
     disable_fan_and_resistor();
-    ClrLcd();
     printf("Air Fryer desligada\n");
-    down = 1;
-    pid = 0;
+    down = 2;
+    pid = -1;
   }
   else if (key_state == 3)
   {
@@ -109,29 +104,31 @@ void check_key_state()
   }
   else if (key_state == 4)
   {
-    pid = 0;
+    pid = -1;
     down = 1;
     printf("Air Fryer parando\n");
+    control_output = pid_control(TI);
+    manage_gpio_devices(control_output);
+    enable_fan(control_output);
+    disable_resistor();
   }
-  else if (down == 0)
+  else if (key_state == 0 && down == 0)
   {
-    pid = 1;
+    pid = 0;
   }
 }
 
 void get_control_signal()
 {
-  if (pid)
+  if (pid == 1)
   {
-    // printf("ligado\n\n");
     pid_configure_constants(Kp, Ki, Kd);
     pid_update_reference(TR);
     control_output = pid_control(TI);
     manage_gpio_devices(control_output);
   }
-  else
+  else if (pid == 0)
   {
-    // printf("desligando\n\n");
     int control_output_temp = 0;
 
     float top_limit = TR + hysteresis / 2.0;
@@ -160,9 +157,6 @@ void shut_down_system()
   disable_fan_and_resistor();
   ClrLcd();
   close_uart(uart);
-  // close_bme280();
-  // refresh();
-  // endwin();
   exit(0);
 }
 
@@ -180,7 +174,7 @@ void set_temperature_reference_input(int potentiometer_active, float new_tempera
 {
   if (!potentiometer_active && new_temperature > TE && new_temperature < 100)
   {
-    // get_control_signal();
+    get_control_signal();
     TR = new_temperature;
   }
 }
