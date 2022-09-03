@@ -31,7 +31,6 @@ int main()
   uart = init_uart();
   bme_connection = connectBme();
   setup_gpio();
-  setup_lcd();
 
   pthread_create(&tid[0], NULL, (void *)info_thread, (void *)NULL);
   pthread_create(&tid[1], NULL, (void *)set_timer, (void *)NULL);
@@ -46,6 +45,7 @@ void set_timer()
 {
   if (iniciate_heat == 1)
   {
+    pid = -1;
     if (TI >= TR)
     {
       int count = timer_counter;
@@ -71,6 +71,7 @@ void set_timer()
       lcd_print(TR, TI, timer_counter, timer_counter_seconds);
       iniciate_heat = 0;
       cool_iniciate_heat = 1;
+      delay(1000);
     }
   }
 }
@@ -87,11 +88,6 @@ void info_thread()
     {
       ClrLcd();
     }
-    else
-    {
-      lcd_print(TR, TI, timer_counter, timer_counter_seconds);
-    }
-
     get_control_signal();
     send_control_signal(uart, control_output);
 
@@ -101,10 +97,11 @@ void info_thread()
     {
       if (TI > TE)
       {
-        cold();
+        enable_fan(100);
       }
       else if (TI < TE)
       {
+        pid = 1;
         cool_iniciate_heat = 0;
       }
     }
@@ -147,12 +144,15 @@ void check_key_state()
     down = 0;
     printf("Air Fryer ligada\n");
     setup_lcd();
+    lcd_print(TR, TI, timer_counter, timer_counter_seconds);
+    write_uart_message_send_char(uart, SEND_SYSTEM_STATE, 1);
     pid = -1;
   }
   else if (key_state == 2)
   {
     disable_fan_and_resistor();
     printf("Air Fryer desligada\n");
+    write_uart_message_send_char(uart, SEND_SYSTEM_STATE, 0);
     down = 2;
     pid = -1;
   }
@@ -160,6 +160,7 @@ void check_key_state()
   {
     pid = 1;
     printf("Air Fryer iniciando\n");
+    write_uart_message_send_char(uart, SEND_CONTROL_TEMPERATURE, 1);
     iniciate_heat = 1;
   }
   else if (key_state == 4)
@@ -167,6 +168,7 @@ void check_key_state()
     pid = -1;
     down = 1;
     printf("Air Fryer parando\n");
+    write_uart_message_send_char(uart, SEND_CONTROL_TEMPERATURE, 0);
     cold();
   }
   else if (key_state == 5)
@@ -182,7 +184,7 @@ void check_key_state()
       write_uart_message_send_geral(uart, SEND_TIMER_VALUE, timer_counter);
     }
   }
-  else if (key_state == 0 && down == 0)
+  else if (key_state == 0 && down == 0 && cool_iniciate_heat == 0)
   {
     pid = 1;
   }

@@ -29,6 +29,7 @@ int init_uart();
 void write_uart_message_request(int uart, int code);
 void write_uart_message_send(int uart, int control_signal);
 void write_uart_message_send_geral(int uart, unsigned char code, int value);
+void write_uart_message_send_char(int uart, unsigned char code, unsigned char value);
 float read_uart_message_temperature(int uart);
 int read_uart_message_key_state(int uart);
 float potentiometer_temperature(int uart, float TR);

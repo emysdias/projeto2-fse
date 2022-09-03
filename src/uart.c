@@ -114,6 +114,31 @@ void write_uart_message_send_geral(int uart, unsigned char code, int value)
     sleep(1);
 }
 
+
+void write_uart_message_send_char(int uart, unsigned char code, unsigned char value)
+{
+    unsigned char data[7] = {SERVER_CODE, SEND_CODE, code, 5, 9, 6, 6};
+    unsigned char message[10];
+
+    memcpy(message, &data, 7);
+    memcpy(&message[7], &value, 1);
+
+    short crc = calcula_CRC(message, 8);
+    memcpy(&message[8], &crc, 2);
+
+    if (uart != -1)
+    {
+        int count = write(uart, &message[0], 10);
+
+        if (count < 0)
+        {
+            printf("UART TX error!\n");
+        }
+    }
+
+    sleep(1);
+}
+
 float read_uart_message_temperature(int uart)
 {
     float response = -1.0;
