@@ -52,7 +52,7 @@ void lcd_print(float tr, float ti, int timer, int seconds)
     typeInt(timer);
     typeln(":");
     typeInt(seconds);
-    typeln(" min");
+    typeln(" sec");
 }
 
 // float to string
