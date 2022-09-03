@@ -88,6 +88,10 @@ void info_thread()
     {
       ClrLcd();
     }
+    else
+    {
+      lcd_print(TR, TI, timer_counter, timer_counter_seconds);
+    }
     get_control_signal();
     send_control_signal(uart, control_output);
 
@@ -145,14 +149,14 @@ void check_key_state()
     printf("Air Fryer ligada\n");
     setup_lcd();
     lcd_print(TR, TI, timer_counter, timer_counter_seconds);
-    write_uart_message_send_char(uart, SEND_SYSTEM_STATE, 1);
+    // write_uart_message_send_char(uart, SEND_SYSTEM_STATE, 1);
     pid = -1;
   }
   else if (key_state == 2)
   {
     disable_fan_and_resistor();
     printf("Air Fryer desligada\n");
-    write_uart_message_send_char(uart, SEND_SYSTEM_STATE, 0);
+    // write_uart_message_send_char(uart, SEND_SYSTEM_STATE, 0);
     down = 2;
     pid = -1;
   }
@@ -160,7 +164,7 @@ void check_key_state()
   {
     pid = 1;
     printf("Air Fryer iniciando\n");
-    write_uart_message_send_char(uart, SEND_CONTROL_TEMPERATURE, 1);
+    // write_uart_message_send_char(uart, SEND_CONTROL_TEMPERATURE, 1);
     iniciate_heat = 1;
   }
   else if (key_state == 4)
@@ -168,7 +172,7 @@ void check_key_state()
     pid = -1;
     down = 1;
     printf("Air Fryer parando\n");
-    write_uart_message_send_char(uart, SEND_CONTROL_TEMPERATURE, 0);
+    // write_uart_message_send_char(uart, SEND_CONTROL_TEMPERATURE, 0);
     cold();
   }
   else if (key_state == 5)
@@ -199,6 +203,29 @@ void get_control_signal()
     control_output = pid_control(TI);
     manage_gpio_devices(control_output);
   }
+  // else if (pid == 0)
+  // {
+  //   int control_output_temp = 0;
+
+  //   float top_limit = TR + hysteresis / 2.0;
+  //   float bottom_limit = TR - hysteresis / 2.0;
+
+  //   if (TI >= top_limit)
+  //   {
+  //     control_output_temp = -100;
+  //     manage_gpio_devices(control_output_temp);
+  //   }
+  //   else if (TI <= bottom_limit)
+  //   {
+  //     control_output_temp = 100;
+  //     manage_gpio_devices(control_output_temp);
+  //   }
+
+  //   if (control_output_temp != 0)
+  //   {
+  //     control_output = control_output_temp;
+  //   }
+  // }
 }
 
 void shut_down_system()
