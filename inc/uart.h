@@ -23,7 +23,6 @@
 #define POTENTIOMETER 1
 #define KEY_STATE 2
 #define CONTROL_SIGNAL 3
-#define TIMER 4
 
 int init_uart();
 void write_uart_message_request(int uart, int code);

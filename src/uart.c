@@ -42,9 +42,6 @@ void write_uart_message_request(int uart, int code)
     {
         codeNumber = REQUEST_KEY_STATE;
     }
-    // else if (code == TIMER){
-    //     codeNumber = 
-    // }
 
     unsigned char data[7] = {SERVER_CODE, REQUEST_CODE, codeNumber, 5, 9, 6, 6};
     short crc = calcula_CRC(data, 7);
@@ -113,7 +110,6 @@ void write_uart_message_send_geral(int uart, unsigned char code, int value)
 
     sleep(1);
 }
-
 
 void write_uart_message_send_char(int uart, unsigned char code, unsigned char value)
 {
@@ -230,21 +226,6 @@ float DS18B20_temperature(int uart, float TI)
     printf("TI: %f\n", TI_temp);
     return TI_temp;
 }
-
-// float timer(int uart, float TI)
-// {
-//     write_uart_message_request(uart, TIMER);
-
-//     float TI_temp = read_uart_message_temperature(uart);
-
-//     if (TI_temp < 0)
-//     {
-//         TI_temp = TI;
-//     }
-
-//     printf("TI: %f\n", TI_temp);
-//     return TI_temp;
-// }
 
 int get_key_state(int uart)
 {

@@ -199,29 +199,6 @@ void get_control_signal()
     control_output = pid_control(TI);
     manage_gpio_devices(control_output);
   }
-  else if (pid == 0)
-  {
-    int control_output_temp = 0;
-
-    float top_limit = TR + hysteresis / 2.0;
-    float bottom_limit = TR - hysteresis / 2.0;
-
-    if (TI >= top_limit)
-    {
-      control_output_temp = -100;
-      manage_gpio_devices(control_output_temp);
-    }
-    else if (TI <= bottom_limit)
-    {
-      control_output_temp = 100;
-      manage_gpio_devices(control_output_temp);
-    }
-
-    if (control_output_temp != 0)
-    {
-      control_output = control_output_temp;
-    }
-  }
 }
 
 void shut_down_system()
