@@ -20,11 +20,15 @@ O usuário deve apertar os botões da dashboard para controlar o sistema da Air 
 
 ## Prints
 
-### Caso onde a temperatura estava bem alta e foi esfriando
+### Caso onde a temperatura estava bem alta e foi esfriando quando desliga a air fryer
 
 ![Screenshot from 2022-09-03 06-08-04](https://user-images.githubusercontent.com/52640974/188264028-0907b899-4614-464d-8940-b94582754feb.png)
 
 
-### Caso a temperatura estava mais baixa e foi subindo
+### Caso a temperatura estava mais baixa e foi subindo quando liga a air fryer
 
 ![Screenshot from 2022-09-03 06-13-21](https://user-images.githubusercontent.com/52640974/188264154-965c910c-1da8-40e7-bec3-e2e943705b95.png)
+
+### Teste de ligar a ventoinha quando passa o timer
+
+![Screenshot from 2022-09-03 06-30-54](https://user-images.githubusercontent.com/52640974/188264879-0e34fadc-d61d-420c-a778-6abd0fb8ba9a.png)
