@@ -45,11 +45,12 @@ void lcd_print(float tr, float ti, float te)
     lcdLoc(LINE1);
     typeln("TR:");
     typeFloat(tr);
-    lcdLoc(LINE2);
     typeln("TI:");
     typeFloat(ti);
-    typeln(" TE:");
-    typeFloat(te);
+    lcdLoc(LINE2);
+    typeln("Timer");
+    typeFloat(2);
+    typeln("min");
 }
 
 // float to string

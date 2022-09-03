@@ -4,6 +4,7 @@
 #include "../inc/get_temperature.h"
 
 void info_thread();
+void set_timer();
 void get_temperatures();
 void check_key_state();
 void get_control_signal();
@@ -22,20 +23,24 @@ int down = 0;
 
 int main()
 {
-  pthread_t tid[3];
+  pthread_t tid[2];
 
   uart = init_uart();
   bme_connection = connectBme();
   setup_gpio();
   setup_lcd();
 
-  pthread_create(&tid[1], NULL, (void *)info_thread, (void *)NULL);
+  pthread_create(&tid[0], NULL, (void *)info_thread, (void *)NULL);
+  pthread_create(&tid[1], NULL, (void *)set_timer, (void *)NULL);
 
   pthread_join(tid[0], NULL);
   pthread_join(tid[1], NULL);
-  pthread_join(tid[2], NULL);
 
   return 0;
+}
+
+void set_timer()
+{
 }
 
 void info_thread()
@@ -82,6 +87,7 @@ void get_temperatures()
 void check_key_state()
 {
   int key_state = get_key_state(uart);
+  printf("key %d\n\n", key_state);
 
   if (key_state == 1)
   {
@@ -107,14 +113,23 @@ void check_key_state()
     pid = -1;
     down = 1;
     printf("Air Fryer parando\n");
+    write_uart_message_send_teste(uart, control_output);
     control_output = pid_control(TI);
     manage_gpio_devices(control_output);
     enable_fan(control_output);
     disable_resistor();
   }
+  else if (key_state == 5)
+  {
+    // timer +
+  }
+  else if (key_state == 6)
+  {
+    // timer -
+  }
   else if (key_state == 0 && down == 0)
   {
-    pid = 0;
+    pid = 1;
   }
 }
 
