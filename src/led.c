@@ -39,18 +39,20 @@ void typeln(const char *s);
 void typeChar(char val);
 int fd; // seen by all subroutines
 
-void lcd_print(float tr, float ti, float te)
+void lcd_print(float tr, float ti, int timer, int seconds)
 {
     usleep(100000);
     lcdLoc(LINE1);
     typeln("TR:");
     typeFloat(tr);
-    typeln("TI:");
+    typeln(" TI:");
     typeFloat(ti);
     lcdLoc(LINE2);
-    typeln("Timer");
-    typeFloat(2);
-    typeln("min");
+    typeln("Timer - ");
+    typeInt(timer);
+    typeln(":");
+    typeInt(seconds);
+    typeln(" min");
 }
 
 // float to string
@@ -60,6 +62,14 @@ void typeFloat(float myFloat)
     sprintf(buffer, "%4.2f", myFloat);
     typeln(buffer);
 }
+
+void typeInt(int i)
+{
+    char buffer[20];
+    sprintf(buffer, "%d", i);
+    typeln(buffer);
+}
+
 
 // clr lcd go home loc 0x80
 void ClrLcd(void)

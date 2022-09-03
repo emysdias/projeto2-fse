@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void lcd_print(float tr, float ti, float te);
+void lcd_print(float tr, float ti, int timer, int secons);
 void ClrLcd(void);
 void setup_lcd();
 

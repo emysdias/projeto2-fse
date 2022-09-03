@@ -90,29 +90,29 @@ void write_uart_message_send(int uart, int control_signal)
     sleep(1);
 }
 
-// void write_uart_message_send_teste(int uart, int control_signal)
-// {
-//     unsigned char data[7] = {SERVER_CODE, SEND_CODE, SEND_CONTROL_TEMPERATURE, 5, 9, 6, 6};
-//     unsigned char message[13];
+void write_uart_message_send_geral(int uart, unsigned char code, int value)
+{
+    unsigned char data[7] = {SERVER_CODE, SEND_CODE, code, 5, 9, 6, 6};
+    unsigned char message[13];
 
-//     memcpy(message, &data, 7);
-//     memcpy(&message[7], &control_signal, 4);
+    memcpy(message, &data, 7);
+    memcpy(&message[7], &value, 4);
 
-//     short crc = calcula_CRC(message, 11);
-//     memcpy(&message[11], &crc, 2);
+    short crc = calcula_CRC(message, 11);
+    memcpy(&message[11], &crc, 2);
 
-//     if (uart != -1)
-//     {
-//         int count = write(uart, &message[0], 13);
+    if (uart != -1)
+    {
+        int count = write(uart, &message[0], 13);
 
-//         if (count < 0)
-//         {
-//             printf("UART TX error!\n");
-//         }
-//     }
+        if (count < 0)
+        {
+            printf("UART TX error!\n");
+        }
+    }
 
-//     sleep(1);
-// }
+    sleep(1);
+}
 
 float read_uart_message_temperature(int uart)
 {

@@ -20,6 +20,9 @@ int pid = 1;
 float hysteresis = 2.0;
 int use_key_switch = 0;
 int down = 0;
+int timer_counter = 0, timer_counter_seconds = 0;
+int iniciate_heat = 0;
+int cool_iniciate_heat = 0;
 
 int main()
 {
@@ -41,6 +44,35 @@ int main()
 
 void set_timer()
 {
+  if (iniciate_heat == 1)
+  {
+    if (TI >= TR)
+    {
+      int count = timer_counter;
+      int aux = timer_counter * 60000;
+      while (aux)
+      {
+        int minutes = (aux / 1000) / 60;
+        int seconds = (aux / 1000) % 60;
+        if (down == 2)
+        {
+          ClrLcd();
+        }
+        else
+        {
+          lcd_print(TR, TI, timer_counter, timer_counter_seconds);
+        }
+        delay(1000);
+        aux = aux - 1000;
+        timer_counter = minutes;
+        timer_counter_seconds = seconds;
+      }
+      timer_counter_seconds = 0;
+      lcd_print(TR, TI, timer_counter, timer_counter_seconds);
+      iniciate_heat = 0;
+      cool_iniciate_heat = 1;
+    }
+  }
 }
 
 void info_thread()
@@ -57,13 +89,27 @@ void info_thread()
     }
     else
     {
-      lcd_print(TR, TI, TE);
+      lcd_print(TR, TI, timer_counter, timer_counter_seconds);
     }
 
     get_control_signal();
     send_control_signal(uart, control_output);
 
-    usleep(500);
+    set_timer();
+
+    if (cool_iniciate_heat == 1)
+    {
+      if (TI > TE)
+      {
+        cold();
+      }
+      else if (TI < TE)
+      {
+        cool_iniciate_heat = 0;
+      }
+    }
+
+    usleep(600000);
   }
 }
 
@@ -84,10 +130,17 @@ void get_temperatures()
   TE = getCurrentTemperature(&bme_connection);
 }
 
+void cold()
+{
+  control_output = pid_control(TI);
+  manage_gpio_devices(control_output);
+  enable_fan(control_output);
+  disable_resistor();
+}
+
 void check_key_state()
 {
   int key_state = get_key_state(uart);
-  printf("key %d\n\n", key_state);
 
   if (key_state == 1)
   {
@@ -107,26 +160,27 @@ void check_key_state()
   {
     pid = 1;
     printf("Air Fryer iniciando\n");
+    iniciate_heat = 1;
   }
   else if (key_state == 4)
   {
     pid = -1;
     down = 1;
     printf("Air Fryer parando\n");
-    write_uart_message_send_teste(uart, control_output);
-    control_output = pid_control(TI);
-    manage_gpio_devices(control_output);
-    int value = (int)control_output;
-    enable_fan(value);
-    disable_resistor();
+    cold();
   }
   else if (key_state == 5)
   {
-    // timer +
+    timer_counter++;
+    write_uart_message_send_geral(uart, SEND_TIMER_VALUE, timer_counter);
   }
   else if (key_state == 6)
   {
-    // timer -
+    if (timer_counter > 0)
+    {
+      timer_counter--;
+      write_uart_message_send_geral(uart, SEND_TIMER_VALUE, timer_counter);
+    }
   }
   else if (key_state == 0 && down == 0)
   {
